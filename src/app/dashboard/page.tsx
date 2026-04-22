@@ -149,7 +149,7 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ pe
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {cards.map((card) => (
+        {cards.map((card: any) => (
           <Card key={card.label} className={`group relative p-0 border-none shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1 overflow-hidden bg-gradient-to-br ${card.bg}`}>
             {/* Base Card Content */}
             <div className="p-6 relative z-10 transition-transform duration-500 group-hover:-translate-y-4">

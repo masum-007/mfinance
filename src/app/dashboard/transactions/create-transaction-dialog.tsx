@@ -104,7 +104,7 @@ export function CreateTransactionDialog({
                   <option value="" disabled>
                     Select...
                   </option>
-                  {accounts.map((acc) => (
+                 {accounts.map((acc: any) => (
                     <option key={acc.id} value={acc.id}>
                       {acc.name}
                     </option>
@@ -126,7 +126,7 @@ export function CreateTransactionDialog({
                   <option value="" disabled>
                     Select...
                   </option>
-                  {categories.map((cat) => (
+                  {categories.map((cat: any) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>

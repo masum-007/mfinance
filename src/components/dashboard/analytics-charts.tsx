@@ -69,7 +69,7 @@ export function CategoryPie({ data }: { data: any[] }) {
               cornerRadius={10} 
               stroke="none"
             >
-              {data.map((entry, index) => (
+              {data.map((entry: any, index: number) => (
                 <Cell 
                   key={`cell-${index}`} 
                   fill={COLORS[index % COLORS.length]} 

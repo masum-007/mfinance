@@ -22,8 +22,8 @@ export default async function SubscriptionsPage() {
   ]);
 
   const monthlyBurnRate = subscriptions
-    .filter((sub) => sub.isActive)
-    .reduce((sum, sub) => {
+    .filter((sub: any) => sub.isActive)
+    .reduce((sum: number, sub: any) => {
       const amount = Number(sub.amount);
       return sum + (sub.billingCycle === "YEARLY" ? amount / 12 : amount);
     }, 0);
@@ -41,7 +41,7 @@ export default async function SubscriptionsPage() {
           </p>
         </div>
         <AddSubscriptionDialog
-          accounts={accounts.map((acc) => ({
+    accounts={accounts.map((acc: any) => ({
             id: acc.id,
             name: acc.name,
             balance: Number(acc.balance),

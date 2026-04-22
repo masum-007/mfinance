@@ -66,7 +66,7 @@ export default async function TransactionsPage(props: {
         </div>
       ) : (
         <div className="grid gap-3">
-          {transactions.map((txn) => (
+          {transactions.map((txn: any) => (
             <div 
               key={txn.id} 
               className="group flex items-center justify-between p-5 bg-white border border-slate-100 rounded-3xl shadow-sm transition-all duration-200 hover:border-primary/30 hover:shadow-md"
