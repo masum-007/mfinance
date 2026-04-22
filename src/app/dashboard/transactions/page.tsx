@@ -48,9 +48,9 @@ export default async function TransactionsPage(props: {
           <p className="text-slate-500 font-medium">Detailed history of your money flow.</p>
         </div>
         <CreateTransactionDialog 
-          accounts={accounts.map(acc => ({ id: acc.id, name: acc.name, balance: Number(acc.balance) }))} 
-          categories={categories} 
-        />
+  accounts={accounts.map((acc: any) => ({ id: acc.id, name: acc.name, balance: Number(acc.balance) }))}
+  categories={categories} 
+/>
       </div>
 
       {/* The new Interactive Search & Filter Bar */}

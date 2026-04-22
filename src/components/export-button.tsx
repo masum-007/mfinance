@@ -11,9 +11,9 @@ export function ExportButton({ data, filename }: { data: any[], filename: string
     const headers = Object.keys(data[0]).join(',')
     
     // Map rows
-    const rows = data.map(obj => 
-      Object.values(obj).map(val => `"${String(val).replace(/"/g, '""')}"`).join(',')
-    ).join('\n')
+    const rows = data.map((obj: any) => 
+  Object.values(obj).map((val: any) => `"${String(val).replace(/"/g, '""')}"`).join(',')
+).join('\n')
 
     const csvContent = `${headers}\n${rows}`
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })

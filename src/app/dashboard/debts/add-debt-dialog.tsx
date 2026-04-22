@@ -64,7 +64,7 @@ export function AddDebtDialog({ accounts }: { accounts: any[] }) {
 >
   {/* 2. Remove the 'selected' attribute from this option */}
   <option value="" disabled>Select...</option>
-  {accounts.map(acc => (
+  {accounts.map((acc: any) => (
     <option key={acc.id} value={acc.id}>{acc.name}</option>
   ))}
 </select>

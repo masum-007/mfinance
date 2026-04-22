@@ -58,7 +58,7 @@ export default async function SettingsPage() {
               { value: "profile", icon: User, label: "Account" },
               { value: "billing", icon: CreditCard, label: "Limits" },
               { value: "notifications", icon: Bell, label: "Alerts" },
-            ].map((tab) => (
+            ].map((tab: any) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}

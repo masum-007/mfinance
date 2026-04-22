@@ -50,13 +50,13 @@ export function AddSubscriptionDialog({ accounts, categories }: { accounts: any[
             <div className="flex flex-col gap-2 text-left">
               <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Account</Label>
               <select name="accountId" className="h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-sm appearance-none outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer" required>
-                {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
+               {accounts.map((acc: any) => <option key={acc.id} value={acc.id}>{acc.name}</option>)}
               </select>
             </div>
             <div className="flex flex-col gap-2 text-left">
               <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Category</Label>
               <select name="categoryId" className="h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-sm appearance-none outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer" required>
-                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+                {categories.map((cat: any) => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
               </select>
             </div>
           </div>
