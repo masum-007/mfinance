@@ -62,7 +62,7 @@ export default async function AccountsPage() {
       ) : (
         /* Modern Account Cards Grid */
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-          {accounts.map((account) => {
+          {accounts.map((account: any) => {
             const styles = getTypeStyles(account.type)
 
             return (

@@ -71,7 +71,7 @@ export default async function SubscriptionsPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {subscriptions.map((sub) => (
+        {subscriptions.map((sub: any) => (
           /* Swapped hardcoded BG/Text for semantic variables */
           <Card
             key={sub.id}
