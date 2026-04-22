@@ -133,8 +133,8 @@ export default async function SettingsPage() {
                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 px-2">
                   Active Labels ({categories.length})
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {categories.map((cat) => (
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {categories.map((cat: any) => (
                     <div
                       key={cat.id}
                       className="group relative flex items-center justify-between p-5 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
