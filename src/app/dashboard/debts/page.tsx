@@ -29,7 +29,7 @@ export default async function DebtPage() {
           <h1 className="text-3xl font-black tracking-tight text-foreground">Liabilities & Receivables</h1>
           <p className="text-slate-500 dark:text-slate-400 font-medium">Keep track of your personal commitments.</p>
         </div>
-        <AddDebtDialog accounts={accounts.map(a => ({ id: a.id, name: a.name }))} />
+        <AddDebtDialog accounts={accounts.map((a: any) => ({ id: a.id, name: a.name }))} />
       </div>
 
       <div className="grid gap-10 lg:grid-cols-2">
