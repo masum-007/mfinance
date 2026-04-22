@@ -62,7 +62,7 @@ export default async function LoginPage({
                 id="email" 
                 name="email" 
                 type="email" 
-                placeholder="john.doe@example.com" 
+                placeholder="name@company.com" 
                 required 
                 className="h-14 w-full px-5 rounded-2xl border border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
               />
