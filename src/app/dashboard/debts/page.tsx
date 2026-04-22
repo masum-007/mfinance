@@ -48,7 +48,7 @@ export default async function DebtPage() {
                 No active debts.
               </div>
             ) : (
-              iOwe.map(debt => (
+              iOwe.map((debt: any) => (
                 /* Removed bg-white! The Card component now handles bg-card automatically */
                 <Card key={debt.id} className="group border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden">
                   <div className="absolute left-0 top-0 bottom-0 w-2 bg-rose-500" />
@@ -92,7 +92,7 @@ export default async function DebtPage() {
                 No active receivables.
               </div>
             ) : (
-              othersOwe.map(debt => (
+             othersOwe.map((debt: any) => (
                 <Card key={debt.id} className="group border-none shadow-md dark:shadow-none transition-all duration-300 rounded-3xl overflow-hidden bg-card dark:border dark:border-border hover:shadow-xl">
                   <div className="absolute left-0 top-0 bottom-0 w-2 bg-emerald-500" />
                   <CardContent className="p-6 pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-transparent">
