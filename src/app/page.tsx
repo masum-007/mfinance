@@ -85,11 +85,22 @@ export default async function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-slate-50 text-center">
-        <p className="text-slate-400 font-bold text-sm tracking-tight">
-          © 2026 MFinance Operating System. Built for financial freedom.
-        </p>
-      </footer>
+      <footer className="border-t border-slate-200 bg-white py-12 px-6 mt-20">
+  <div className="max-w-7xl mx-auto flex flex-col items-center justify-center text-center space-y-2">
+    <div className="flex items-center gap-2 font-black text-xl tracking-tight text-slate-900 mb-4">
+      <div className="bg-primary text-white p-1.5 rounded-lg shadow-md">
+        <PieChart size={20} />
+      </div>
+      <span>MFinance</span>
+    </div>
+    <p className="text-sm font-bold text-slate-500">
+      © 2026 MFinance Operating System. Built for financial freedom.
+    </p>
+    <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mt-2">
+      by Masum Al Mahamud
+    </p>
+  </div>
+</footer>
     </div>
   )
 }
