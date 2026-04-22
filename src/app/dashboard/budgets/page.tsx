@@ -40,22 +40,22 @@ export default async function BudgetsPage() {
   return (
     <div className="space-y-10 pb-20">
       <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-black tracking-tight text-slate-900">Spending Goals</h1>
+        <h1 className="text-3xl font-black tracking-tight text-card-foreground">Spending Goals</h1>
         <p className="text-slate-500 font-medium uppercase text-[11px] tracking-[0.2em]">
           Plan for {now.toLocaleString('default', { month: 'long' })} {currentYear}
         </p>
       </div>
 
       {budgetStats.length === 0 ? (
-        <div className="flex h-[300px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-white text-center p-8">
+        <div className="flex h-[300px] flex-col items-center justify-center rounded-3xl border-2 border-dashed bg-background text-center p-8">
           <Target className="h-12 w-12 text-slate-200 mb-4" />
-          <h3 className="text-lg font-bold text-slate-900">No targets set</h3>
+          <h3 className="text-lg font-bold text-card-foreground">No targets set</h3>
           <p className="text-sm text-slate-500 max-w-xs">Define expense categories in settings to start managing your monthly limits.</p>
         </div>
       ) : (
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {budgetStats.map((stat: any) => (
-            <Card key={stat.id} className="group border-none shadow-xl hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden bg-white">
+            <Card key={stat.id} className="group border-none shadow-xl hover:shadow-2xl transition-all duration-300 rounded-3xl overflow-hidden bg-background">
               <CardHeader className="pb-4">
                 <CardTitle className="text-sm font-black flex justify-between items-center text-slate-400 uppercase tracking-widest">
                   <span className="group-hover:text-primary transition-colors">{stat.name}</span>
@@ -73,7 +73,7 @@ export default async function BudgetsPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-3">
                   <div className="flex justify-between items-end">
-                    <div className="text-3xl font-black text-slate-900 tracking-tighter">
+                    <div className="text-3xl font-black text-card-foreground tracking-tighter">
                       ${stat.spent.toFixed(2)}
                     </div>
                     <div className="text-xs font-bold text-slate-400">

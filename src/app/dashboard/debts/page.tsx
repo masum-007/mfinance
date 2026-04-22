@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma'
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { AddDebtDialog } from './add-debt-dialog'
-import { RepayDialog } from './repay-dialog' // <-- This is the new import!
+import { RepayDialog } from './repay-dialog'
 import { UserMinus, UserPlus, Calendar } from 'lucide-react'
 
 export default async function DebtPage() {
@@ -13,7 +13,7 @@ export default async function DebtPage() {
   const [accounts, debts] = await Promise.all([
     prisma.account.findMany({ where: { userId: user.id } }),
     prisma.debt.findMany({ 
-      where: { userId: user.id, status: 'OPEN' }, // Only show open debts
+      where: { userId: user.id, status: 'OPEN' },
       orderBy: { createdAt: 'desc' } 
     })
   ])
@@ -25,37 +25,40 @@ export default async function DebtPage() {
     <div className="space-y-10 pb-20">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">Liabilities & Receivables</h1>
-          <p className="text-slate-500 font-medium">Keep track of your personal commitments.</p>
+          {/* Changed text-slate-900 to text-foreground */}
+          <h1 className="text-3xl font-black tracking-tight text-foreground">Liabilities & Receivables</h1>
+          <p className="text-slate-500 dark:text-slate-400 font-medium">Keep track of your personal commitments.</p>
         </div>
         <AddDebtDialog accounts={accounts.map(a => ({ id: a.id, name: a.name }))} />
       </div>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        {/* Section: I Owe */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 px-1">
-            <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-rose-50 text-rose-600 border border-rose-100 shadow-sm">
+            <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 border border-rose-100 dark:border-rose-900/30 shadow-sm">
               <UserMinus size={20} />
             </div>
-            <h2 className="text-xl font-extrabold text-slate-800">People I Owe</h2>
+            {/* Changed text-slate-800 to text-foreground */}
+            <h2 className="text-xl font-extrabold text-foreground">People I Owe</h2>
           </div>
           
           <div className="grid gap-4">
             {iOwe.length === 0 ? (
-              <div className="p-8 text-center border-2 border-dashed rounded-3xl text-slate-400 font-medium bg-slate-50/50">
+              <div className="p-8 text-center border-2 border-dashed rounded-3xl text-slate-400 dark:text-slate-600 font-medium bg-background border-border">
                 No active debts.
               </div>
             ) : (
               iOwe.map(debt => (
-                <Card key={debt.id} className="group border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden bg-white">
+                /* Removed bg-white! The Card component now handles bg-card automatically */
+                <Card key={debt.id} className="group border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden">
                   <div className="absolute left-0 top-0 bottom-0 w-2 bg-rose-500" />
-                  <CardContent className="p-6 pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
+                  <CardContent className="p-6 pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-1">
-                      <p className="text-xl font-black text-slate-900 group-hover:text-rose-600 transition-colors">
+                      {/* Removed text-slate-900 */}
+                      <p className="text-xl font-black text-foreground group-hover:text-rose-600 transition-colors">
                         {debt.counterpartyName}
                       </p>
-                      <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                      <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                         <Calendar size={12} />
                         Due: {debt.dueDate ? new Date(debt.dueDate).toLocaleDateString() : 'Flexible'}
                       </div>
@@ -65,7 +68,6 @@ export default async function DebtPage() {
                       <div className="text-2xl font-black text-rose-600 tracking-tighter">
                         ${Number(debt.remainingAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </div>
-                      {/* The Repayment Button Component */}
                       <RepayDialog debtId={debt.id} currentAmount={Number(debt.remainingAmount)} type={debt.type} />
                     </div>
                   </CardContent>
@@ -78,27 +80,27 @@ export default async function DebtPage() {
         {/* Section: Others Owe Me */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 px-1">
-            <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm">
+            <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 border border-emerald-100 dark:border-emerald-900/30 shadow-sm transition-colors">
               <UserPlus size={20} />
             </div>
-            <h2 className="text-xl font-extrabold text-slate-800">Others Owe Me</h2>
+            <h2 className="text-xl font-extrabold text-foreground">Others Owe Me</h2>
           </div>
 
           <div className="grid gap-4">
             {othersOwe.length === 0 ? (
-              <div className="p-8 text-center border-2 border-dashed rounded-3xl text-slate-400 font-medium bg-slate-50/50">
+              <div className="p-8 text-center border-2 border-dashed rounded-3xl text-slate-400 dark:text-slate-600 font-medium bg-slate-50/50 dark:bg-slate-900/20 border-slate-200 dark:border-slate-800">
                 No active receivables.
               </div>
             ) : (
               othersOwe.map(debt => (
-                <Card key={debt.id} className="group border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden bg-white">
+                <Card key={debt.id} className="group border-none shadow-md dark:shadow-none transition-all duration-300 rounded-3xl overflow-hidden bg-card dark:border dark:border-border hover:shadow-xl">
                   <div className="absolute left-0 top-0 bottom-0 w-2 bg-emerald-500" />
-                  <CardContent className="p-6 pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white">
+                  <CardContent className="p-6 pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-transparent">
                     <div className="space-y-1">
-                      <p className="text-xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors">
+                      <p className="text-xl font-black text-foreground group-hover:text-emerald-600 transition-colors">
                         {debt.counterpartyName}
                       </p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                      <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
                         <Calendar size={12} />
                         Issued: {new Date(debt.createdAt).toLocaleDateString()}
                       </p>
@@ -108,7 +110,6 @@ export default async function DebtPage() {
                       <div className="text-2xl font-black text-emerald-600 tracking-tighter">
                         ${Number(debt.remainingAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </div>
-                      {/* The Repayment Button Component */}
                       <RepayDialog debtId={debt.id} currentAmount={Number(debt.remainingAmount)} type={debt.type} />
                     </div>
                   </CardContent>

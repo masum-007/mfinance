@@ -17,12 +17,12 @@ export function AddSubscriptionDialog({ accounts, categories }: { accounts: any[
         <Plus size={18} strokeWidth={3} />
         <span>Add Subscription</span>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[440px] p-6 sm:p-8 bg-white rounded-3xl sm:rounded-[2rem] border-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[440px] p-6 sm:p-8 bg-card rounded-3xl sm:rounded-[2rem] border-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-left mb-6 space-y-1.5">
           <div className="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2">
             <Repeat size={20} />
           </div>
-          <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">New Subscription</DialogTitle>
+          <DialogTitle className="text-2xl font-black tracking-tight text-card-foreground">New Subscription</DialogTitle>
           <DialogDescription className="text-slate-500 font-medium">Track a recurring monthly or yearly bill.</DialogDescription>
         </DialogHeader>
 

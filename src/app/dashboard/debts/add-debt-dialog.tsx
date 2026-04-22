@@ -56,12 +56,18 @@ export function AddDebtDialog({ accounts }: { accounts: any[] }) {
           <div className="grid grid-cols-2 gap-4">
              <div className="flex flex-col gap-2">
               <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Source</Label>
-              <select name="accountId" className="h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-sm appearance-none outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer" required>
-                <option value="" disabled selected>Select...</option>
-                {accounts.map(acc => (
-                  <option key={acc.id} value={acc.id}>{acc.name}</option>
-                ))}
-              </select>
+{/* 1. Add defaultValue="" to the <select> tag */}
+<select 
+  name="accountId" 
+  defaultValue="" 
+  className="h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50 font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+>
+  {/* 2. Remove the 'selected' attribute from this option */}
+  <option value="" disabled>Select...</option>
+  {accounts.map(acc => (
+    <option key={acc.id} value={acc.id}>{acc.name}</option>
+  ))}
+</select>
             </div>
             <div className="flex flex-col gap-2">
               <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Due Date</Label>

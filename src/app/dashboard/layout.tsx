@@ -11,7 +11,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuGroup, // <-- Imported the Group wrapper to fix the Base UI error
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 import { createClient } from '@/lib/supabase/server'
 
@@ -29,12 +29,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB]">
-      {/* Sidebar */}
-      <aside className="w-64 border-r bg-white hidden md:flex flex-col sticky top-0 h-screen">
-        <div className="h-16 flex items-center px-6 border-b">
+    <div className="flex min-h-screen bg-background">
+      <aside className="w-64 border-r border-border bg-card hidden md:flex flex-col sticky top-0 h-screen">
+        <div className="h-16 flex items-center px-6 border-b border-border">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-primary">
-            <div className="bg-primary text-white p-1.5 rounded-lg shadow-md shadow-primary/20">
+            <div className="bg-primary text-background p-1.5 rounded-lg shadow-md">
               <PieChart size={20} />
             </div>
             <span>MFinance</span>
@@ -46,7 +45,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Link 
               key={item.href}
               href={item.href} 
-              className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-50 hover:text-primary group"
+              className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-primary group"
             >
               <item.icon size={18} className="group-hover:scale-110 transition-transform" />
               {item.label}
@@ -54,8 +53,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
           ))}
         </nav>
 
-        <div className="p-4 border-t space-y-1">
-          <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl text-slate-500 hover:bg-slate-50 transition-colors">
+        <div className="p-4 border-t border-border space-y-1">
+          <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl text-slate-500 hover:bg-slate-100 transition-colors">
             <Settings size={18} />
             Settings
           </Link>
@@ -69,9 +68,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         </div>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        <header className="h-16 border-b bg-white/80 backdrop-blur-xl sticky top-0 z-40 flex items-center justify-between px-8">
+        <header className="h-16 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-40 flex items-center justify-between px-8">
           <div className="md:hidden font-black text-primary flex items-center gap-2">
             <PieChart size={20} /> MFinance
           </div>
@@ -82,16 +80,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <UserCircle size={22} />
               </DropdownMenuTrigger>
               
-              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 border-slate-100 shadow-2xl bg-white mt-1">
-                
-                {/* Fix: Wrapped the Label in a Group to satisfy Base UI context */}
+              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 border-border shadow-2xl bg-card mt-1">
                 <DropdownMenuGroup>
-                  <DropdownMenuLabel className="font-bold text-slate-900 truncate">
+                  <DropdownMenuLabel className="font-bold text-foreground truncate px-3 py-2">
                     {user?.email || 'My Account'}
                   </DropdownMenuLabel>
                 </DropdownMenuGroup>
 
-                <DropdownMenuSeparator className="bg-slate-100" />
+                <DropdownMenuSeparator className="bg-border" />
                 
                 <DropdownMenuItem className="rounded-xl cursor-pointer p-0">
                   <Link href="/dashboard/settings" className="flex items-center w-full p-3 font-bold text-slate-600 hover:bg-slate-50 outline-none rounded-xl">
@@ -99,7 +95,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                   </Link>
                 </DropdownMenuItem>
                 
-                <DropdownMenuSeparator className="bg-slate-100" />
+                <DropdownMenuSeparator className="bg-border" />
                 
                 <form action={logout}>
                   <DropdownMenuItem className="rounded-xl p-0">
@@ -108,7 +104,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
                     </button>
                   </DropdownMenuItem>
                 </form>
-
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

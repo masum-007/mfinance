@@ -3,36 +3,59 @@ import prisma from "@/lib/prisma"
 import { createClient } from "@/lib/supabase/server"
 import { TrendingUp, Wallet, ArrowDownCircle, ArrowUpCircle } from 'lucide-react'
 import { SpendingChart, CategoryPie } from "@/components/dashboard/analytics-charts"
+import { DateFilter } from "./date-filter"
+import { ExportButton } from "@/components/export-button"
 
-export default async function DashboardPage() {
+export default async function DashboardPage(props: { searchParams?: Promise<{ period?: string }> }) {
+  const searchParams = await props.searchParams
+  const period = searchParams?.period || 'all'
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  // Fetch everything
-  const [accounts, debts, transactions, categories] = await Promise.all([
+  const now = new Date()
+  let dateFilter: any = undefined
+
+  if (period === 'this_month') {
+    dateFilter = { gte: new Date(now.getFullYear(), now.getMonth(), 1) }
+  } else if (period === 'last_month') {
+    dateFilter = {
+      gte: new Date(now.getFullYear(), now.getMonth() - 1, 1),
+      lt: new Date(now.getFullYear(), now.getMonth(), 1)
+    }
+  } else if (period === 'ytd') {
+    dateFilter = { gte: new Date(now.getFullYear(), 0, 1) }
+  }
+
+  const [accounts, debts, transactions] = await Promise.all([
     prisma.account.findMany({ where: { userId: user.id } }),
     prisma.debt.findMany({ where: { userId: user.id, status: 'OPEN' } }),
     prisma.transaction.findMany({ 
-      where: { userId: user.id }, 
+      where: { 
+        userId: user.id,
+        ...(dateFilter ? { createdAt: dateFilter } : {})
+      }, 
       orderBy: { createdAt: 'asc' },
-      include: { category: true }
-    }),
-    prisma.category.findMany({ where: { userId: user.id } })
+      include: { category: true, account: true }
+    })
   ])
 
-  // Math for Header Cards (With explicit types to fix TS errors)
-  const balance = accounts.reduce((s: number, a: any) => s + Number(a.balance), 0)
-  const owed = debts.filter((d: any) => d.type === 'Owe').reduce((s: number, d: any) => s + Number(d.remainingAmount), 0)
-  const lent = debts.filter((d: any) => d.type === 'Lent').reduce((s: number, d: any) => s + Number(d.remainingAmount), 0)
+  // Math Setup
+  const currentBalance = accounts.reduce((s: number, a: any) => s + Number(a.balance), 0)
+  const othersOwe = debts.filter((d: any) => d.type === 'Lent').reduce((s: number, d: any) => s + Number(d.remainingAmount), 0)
+  const iOwe = debts.filter((d: any) => d.type === 'Owe').reduce((s: number, d: any) => s + Number(d.remainingAmount), 0)
+  const currentNetWorth = currentBalance + othersOwe - iOwe
+  
+  const periodIncome = transactions.filter((t: any) => t.type === 'INCOME').reduce((s: number, t: any) => s + Number(t.amount), 0)
+  const periodExpenses = transactions.filter((t: any) => t.type === 'EXPENSE').reduce((s: number, t: any) => s + Number(t.amount), 0)
 
-  // Data for Spending Chart
-  const chartData = transactions.slice(-7).map((t: any) => ({
+  // Chart Mappers
+  const chartData = transactions.slice(-14).map((t: any) => ({
     name: new Date(t.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
     value: Number(t.amount)
   }))
 
-  // Data for Category Pie
   const categoryMap: Record<string, number> = {}
   transactions.filter((t: any) => t.type === 'EXPENSE').forEach((t: any) => {
     const name = t.category?.name || 'Uncategorized'
@@ -40,66 +63,117 @@ export default async function DashboardPage() {
   })
   const pieData = Object.entries(categoryMap).map(([name, value]) => ({ name, value }))
 
-  // Pre-calculate hover data
-  const topAccounts = accounts.slice(0, 3)
+  const exportData = transactions.map((t: any) => ({
+    Date: new Date(t.createdAt).toLocaleDateString(),
+    Type: t.type,
+    Amount: Number(t.amount),
+    Category: t.category?.name || 'None',
+    Account: t.account?.name || 'Unknown',
+    Note: t.note || ''
+  }))
 
+  // The new UI Configuration for the Modern Cards
   const cards = [
     { 
-      label: 'Total Balance', amount: balance, icon: Wallet, 
-      bg: 'bg-gradient-to-br from-blue-50 to-blue-100', iconColor: 'text-blue-600', iconBg: 'bg-blue-200/50',
-      hoverInfo: topAccounts.map((a: any) => `${a.name}: $${Number(a.balance).toFixed(0)}`).join(' • ') || 'No accounts yet'
+      label: 'Current Balance', 
+      amount: currentBalance, 
+      icon: Wallet, 
+      bg: 'from-blue-600 to-blue-800', 
+      details: (
+        <div className="space-y-2 mt-2 w-full text-blue-50">
+          <p className="border-b border-blue-400/30 pb-1 font-bold text-[10px] uppercase tracking-widest">Account Breakdown</p>
+          {accounts.slice(0, 3).map((a: any) => (
+            <div key={a.id} className="flex justify-between items-center text-xs font-medium">
+              <span className="truncate mr-2 opacity-90">{a.name}</span>
+              <span className="font-bold">${Number(a.balance).toFixed(0)}</span>
+            </div>
+          ))}
+          {accounts.length > 3 && <p className="text-[10px] opacity-70 italic text-right">+ {accounts.length - 3} more</p>}
+        </div>
+      )
     },
     { 
-      label: 'Net Worth', amount: (balance + lent - owed), icon: TrendingUp, 
-      bg: 'bg-gradient-to-br from-indigo-50 to-indigo-100', iconColor: 'text-indigo-600', iconBg: 'bg-indigo-200/50',
-      hoverInfo: `Bal ($${balance.toFixed(0)}) + Lent ($${lent.toFixed(0)}) - Owed ($${owed.toFixed(0)})`
+      label: 'Net Worth', 
+      amount: currentNetWorth, 
+      icon: TrendingUp, 
+      bg: 'from-indigo-600 to-indigo-900', 
+      details: (
+        <div className="space-y-2 mt-2 w-full text-indigo-50">
+          <p className="border-b border-indigo-400/30 pb-1 font-bold text-[10px] uppercase tracking-widest">Asset Calculation</p>
+          <div className="flex justify-between text-xs font-medium">
+            <span className="opacity-90">Total Assets</span>
+            <span className="font-bold text-emerald-300">+${(currentBalance + othersOwe).toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between text-xs font-medium">
+            <span className="opacity-90">Total Liabilities</span>
+            <span className="font-bold text-rose-300">-${iOwe.toLocaleString()}</span>
+          </div>
+        </div>
+      )
     },
     { 
-      label: 'Debts Owed', amount: owed, icon: ArrowDownCircle, 
-      bg: 'bg-gradient-to-br from-rose-50 to-rose-100', iconColor: 'text-rose-600', iconBg: 'bg-rose-200/50',
-      hoverInfo: debts.filter((d: any) => d.type === 'Owe').map((d: any) => `${d.counterpartyName}: $${Number(d.remainingAmount).toFixed(0)}`).join(' • ') || 'Zero debt!'
+      label: 'Period Income', 
+      amount: periodIncome, 
+      icon: ArrowUpCircle, 
+      bg: 'from-emerald-500 to-emerald-700', 
+      details: (
+        <div className="mt-2 w-full text-emerald-50 text-xs font-medium leading-relaxed opacity-90">
+          Total incoming cash flow across all accounts for the currently selected time period.
+        </div>
+      )
     },
     { 
-      label: 'Money Lent', amount: lent, icon: ArrowUpCircle, 
-      bg: 'bg-gradient-to-br from-emerald-50 to-emerald-100', iconColor: 'text-emerald-600', iconBg: 'bg-emerald-200/50',
-      hoverInfo: debts.filter((d: any) => d.type === 'Lent').map((d: any) => `${d.counterpartyName}: $${Number(d.remainingAmount).toFixed(0)}`).join(' • ') || 'Nothing lent out'
+      label: 'Period Expenses', 
+      amount: periodExpenses, 
+      icon: ArrowDownCircle, 
+      bg: 'from-rose-500 to-rose-800', 
+      details: (
+        <div className="mt-2 w-full text-rose-50 text-xs font-medium leading-relaxed opacity-90">
+          Total outgoing expenditures and payments for the currently selected time period.
+        </div>
+      )
     },
   ]
 
   return (
     <div className="space-y-10 pb-20">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Overview</h1>
-        <p className="text-slate-500 font-medium">Real-time insights into your financial flow.</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Overview</h1>
+          <p className="text-slate-500 font-medium">Real-time insights into your financial flow.</p>
+        </div>
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <DateFilter />
+          <ExportButton data={exportData} filename={`MFinance-Transactions-${period}`} />
+        </div>
       </div>
 
-      {/* Hover Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
-          <Card key={card.label} className={`group relative p-6 border-none shadow-lg transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 overflow-hidden ${card.bg}`}>
-            {/* Hover Overlay Glassmorphism */}
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 flex items-center justify-center p-6 text-center">
-              <p className="text-sm font-bold text-slate-800 leading-relaxed">{card.hoverInfo}</p>
-            </div>
-            
-            <div className="relative z-0">
+          <Card key={card.label} className={`group relative p-0 border-none shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1 overflow-hidden bg-gradient-to-br ${card.bg}`}>
+            {/* Base Card Content */}
+            <div className="p-6 relative z-10 transition-transform duration-500 group-hover:-translate-y-4">
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-2.5 rounded-xl ${card.iconBg} ${card.iconColor}`}>
+                <div className="p-2.5 rounded-xl bg-white/20 text-white backdrop-blur-sm">
                   <card.icon size={20} />
                 </div>
               </div>
               <div>
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-500">{card.label}</p>
-                <h3 className="text-2xl font-black text-slate-900 mt-1 tracking-tighter">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/70">{card.label}</p>
+                <h3 className="text-2xl font-black text-white mt-1 tracking-tighter drop-shadow-sm">
                   ${card.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </h3>
               </div>
+            </div>
+
+            {/* Hover Details Overlay (Slides up seamlessly) */}
+            <div className="absolute inset-x-0 bottom-0 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 bg-black/40 backdrop-blur-md p-5 z-20 flex flex-col justify-end">
+              {card.details}
             </div>
           </Card>
         ))}
       </div>
       
-      {/* Analytics Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
         <SpendingChart data={chartData} />
         <CategoryPie data={pieData} />

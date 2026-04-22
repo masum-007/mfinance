@@ -2,6 +2,7 @@ import prisma from "@/lib/prisma";
 import { createClient } from "@/lib/supabase/server";
 import { AddSubscriptionDialog } from "./add-sub-dialog";
 import { Calendar, CreditCard, Flame, Power, PowerOff } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default async function SubscriptionsPage() {
   const supabase = await createClient();
@@ -20,7 +21,6 @@ export default async function SubscriptionsPage() {
     }),
   ]);
 
-  // Calculate Monthly Burn Rate (Monthly subs + Yearly subs / 12)
   const monthlyBurnRate = subscriptions
     .filter((sub) => sub.isActive)
     .reduce((sum, sub) => {
@@ -32,10 +32,11 @@ export default async function SubscriptionsPage() {
     <div className="space-y-8 pb-20">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">
+          {/* Changed text-slate-900 to text-foreground */}
+          <h1 className="text-3xl font-black tracking-tight text-foreground">
             Subscriptions
           </h1>
-          <p className="text-slate-500 font-medium">
+          <p className="text-slate-500 dark:text-slate-400 font-medium">
             Manage your recurring bills and burn rate.
           </p>
         </div>
@@ -43,14 +44,14 @@ export default async function SubscriptionsPage() {
           accounts={accounts.map((acc) => ({
             id: acc.id,
             name: acc.name,
-            balance: Number(acc.balance), // <-- This converts the Decimal to a standard number
+            balance: Number(acc.balance),
           }))}
           categories={categories}
         />
       </div>
 
-      {/* Burn Rate Highlight Card */}
-      <div className="bg-slate-900 rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden">
+      {/* Burn Rate Highlight Card: Using dark-slate for contrast */}
+      <div className="bg-slate-900 dark:bg-slate-950 border border-slate-800 rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden transition-colors">
         <div className="absolute top-0 right-0 p-8 opacity-10">
           <Flame size={120} />
         </div>
@@ -71,71 +72,70 @@ export default async function SubscriptionsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {subscriptions.map((sub) => (
-          <div
+          /* Swapped hardcoded BG/Text for semantic variables */
+          <Card
             key={sub.id}
-            className={`p-6 rounded-3xl border shadow-sm transition-all duration-300 relative overflow-hidden ${
+            className={`p-0 rounded-3xl border shadow-sm transition-all duration-300 relative overflow-hidden ${
               sub.isActive
-                ? "bg-white border-slate-100 hover:border-indigo-200 hover:shadow-xl"
-                : "bg-slate-50 border-slate-200 opacity-60"
+                ? "bg-card border-border hover:border-primary/20 hover:shadow-xl"
+                : "bg-muted/30 border-border opacity-60"
             }`}
           >
-            <div className="flex justify-between items-start mb-6">
-              <div className="space-y-1">
-                <h3 className="text-xl font-black text-slate-900">
-                  {sub.name}
-                </h3>
-                <div className="flex gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md">
-                    {sub.billingCycle}
-                  </span>
-                  {sub.category && (
-                    <span className="text-[10px] font-bold uppercase tracking-widest bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md">
-                      {sub.category.name}
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div className="space-y-1">
+                  <h3 className="text-xl font-black text-foreground">
+                    {sub.name}
+                  </h3>
+                  <div className="flex gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest bg-muted text-muted-foreground px-2 py-0.5 rounded-md">
+                      {sub.billingCycle}
                     </span>
-                  )}
+                    {sub.category && (
+                      <span className="text-[10px] font-bold uppercase tracking-widest bg-primary/10 text-primary px-2 py-0.5 rounded-md">
+                        {sub.category.name}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <form
-                action={async () => {
-                  "use server"; /* Implement Toggle in actions.ts */
-                }}
-              >
-                <button
-                  title={sub.isActive ? "Pause" : "Activate"}
-                  className={`h-8 w-8 rounded-full flex items-center justify-center transition-colors ${
-                    sub.isActive
-                      ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
-                      : "bg-emerald-50 text-emerald-500 hover:bg-emerald-100"
-                  }`}
-                >
-                  {sub.isActive ? (
-                    <PowerOff size={14} strokeWidth={3} />
-                  ) : (
-                    <Power size={14} strokeWidth={3} />
-                  )}
-                </button>
-              </form>
-            </div>
-
-            <div className="space-y-4">
-              <div className="text-3xl font-black tracking-tighter text-slate-900">
-                ${Number(sub.amount).toFixed(2)}
+                <form action={async () => { "use server"; }}>
+                  <button
+                    title={sub.isActive ? "Pause" : "Activate"}
+                    className={`h-8 w-8 rounded-full flex items-center justify-center transition-colors ${
+                      sub.isActive
+                        ? "bg-rose-50 dark:bg-rose-900/30 text-rose-500 hover:bg-rose-100"
+                        : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 hover:bg-emerald-100"
+                    }`}
+                  >
+                    {sub.isActive ? (
+                      <PowerOff size={14} strokeWidth={3} />
+                    ) : (
+                      <Power size={14} strokeWidth={3} />
+                    )}
+                  </button>
+                </form>
               </div>
 
-              <div className="flex items-center justify-between text-xs font-bold text-slate-500 pt-4 border-t border-slate-100">
-                <div className="flex items-center gap-1.5">
-                  <CreditCard size={14} /> {sub.account.name}
+              <div className="space-y-4">
+                <div className="text-3xl font-black tracking-tighter text-foreground">
+                  ${Number(sub.amount).toFixed(2)}
                 </div>
-                <div className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
-                  <Calendar size={14} />
-                  {new Date(sub.nextDate).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                  })}
+
+                <div className="flex items-center justify-between text-xs font-bold text-muted-foreground pt-4 border-t border-border">
+                  <div className="flex items-center gap-1.5">
+                    <CreditCard size={14} /> {sub.account.name}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-primary bg-primary/10 px-2 py-1 rounded-md">
+                    <Calendar size={14} />
+                    {new Date(sub.nextDate).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>

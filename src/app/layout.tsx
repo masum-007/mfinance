@@ -1,11 +1,10 @@
 import { Plus_Jakarta_Sans } from 'next/font/google'
-import './globals.css' // Keep this to load your Tailwind styles!
+import './globals.css'
+import { ThemeProvider } from '@/components/theme-provider'
 
-// 1. Configure the premium modern font
 const jakarta = Plus_Jakarta_Sans({ 
   subsets: ['latin'],
   variable: '--font-sans',
-  // Loading the specific weights we used throughout the UI
   weight: ['400', '500', '600', '700', '800'], 
 })
 
@@ -18,11 +17,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body 
-        // 2. Apply the font variable and the global font-sans class
-        className={`${jakarta.variable} font-sans min-h-screen flex flex-col antialiased bg-[#F9FAFB]`}
-        suppressHydrationWarning 
+        className={`${jakarta.variable} font-sans min-h-screen flex flex-col antialiased bg-[#F9FAFB] text-slate-900`} 
+        suppressHydrationWarning
       >
-        {children}
+        <ThemeProvider 
+          attribute="class" 
+          forcedTheme="light" 
+          enableSystem={false} 
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

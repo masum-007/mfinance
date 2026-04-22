@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Search, Filter } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export function TransactionFilters() {
   const router = useRouter()
@@ -12,25 +12,36 @@ export function TransactionFilters() {
 
   const [query, setQuery] = useState(searchParams.get('query') || '')
   const [type, setType] = useState(searchParams.get('type') || '')
+  
+  // Use a ref to prevent the effect from running on the initial mount
+  const isMounted = useRef(false)
 
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true
+      return
+    }
+
     const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams)
+      const params = new URLSearchParams(searchParams.toString())
       if (query) params.set('query', query)
       else params.delete('query')
       
       if (type) params.set('type', type)
       else params.delete('type')
 
-      router.push(`${pathname}?${params.toString()}`)
+      // scroll: false prevents the page from jumping when filtering
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
     }, 300)
 
     return () => clearTimeout(timer)
-  }, [query, type, pathname, router, searchParams])
+  // WARNING: Deliberately excluding searchParams/router to prevent infinite loop lag!
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, type])
 
   return (
-    // Fixed: Clean sticky positioning matching header height, removed weird padding/borders
-    <div className="sticky top-[64px] z-30 py-4 bg-[#F9FAFB] flex flex-col sm:flex-row gap-3">
+    // Fixed: top-16 locks it precisely beneath the header, bg-[#F9FAFB] hides scrolling items
+    <div className="sticky top-16 z-30 py-4 bg-[#F9FAFB] flex flex-col sm:flex-row gap-3">
       <div className="relative flex-1">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
         <Input 
