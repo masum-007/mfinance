@@ -22,7 +22,7 @@ export async function createTransaction(formData: FormData) {
 
   // We use prisma.$transaction to ensure the account balance updates 
   // at the EXACT same time the transaction is recorded.
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     // 1. Fetch the current account to ensure it exists and belongs to the user
     const account = await tx.account.findFirst({
       where: { id: accountId, userId: user.id }
