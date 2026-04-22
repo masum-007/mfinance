@@ -16,6 +16,7 @@ export async function login(formData: FormData) {
   })
 
   if (error) {
+    // Redirects to /login at the root of src/app
     redirect(`/login?error=${encodeURIComponent(error.message)}`)
   }
 
@@ -35,14 +36,16 @@ export async function signup(formData: FormData) {
     password,
     options: {
       data: {
-        name: name, // This gets caught by your SQL trigger to populate Prisma!
+        name: name,
       }
     }
   })
 
   if (error) {
+    // Redirects to /signup at the root of src/app
     redirect(`/signup?error=${encodeURIComponent(error.message)}`)
   }
+
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }

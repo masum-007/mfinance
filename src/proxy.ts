@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
+// The function name is now 'proxy'
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -27,17 +28,17 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // This refreshes the session if needed
+  // Refresh session and get the user
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Protect the dashboard and any private routes
+  // 1. Protect Private Routes
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Redirect logged-in users away from auth pages
+  // 2. Prevent Double Login
   if (user && (request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
@@ -47,15 +48,9 @@ export async function proxy(request: NextRequest) {
   return supabaseResponse
 }
 
+// The matcher configuration remains the same
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public (public files)
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public|api).*)',
   ],
 }
