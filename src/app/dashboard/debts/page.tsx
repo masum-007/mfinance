@@ -18,8 +18,8 @@ export default async function DebtPage() {
     })
   ])
 
-  const iOwe = debts.filter(d => d.type === 'Owe')
-  const othersOwe = debts.filter(d => d.type === 'Lent')
+  const iOwe = debts.filter((d: any) => d.type === 'Owe')
+  const othersOwe = debts.filter((d: any) => d.type === 'Lent')
 
   return (
     <div className="space-y-10 pb-20">
