@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Emulating Supabase Auth User
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String?
+  accounts     Account[]
+  categories   Category[]
+  transactions Transaction[]
+  debts        Debt[]
+  createdAt    DateTime      @default(now())
+}
+
+model Account {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String        // e.g., "Main Checking", "Cash"
+  type         String        // e.g., "bank", "mobile", "wallet"
+  balance      Decimal       @default(0.00)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Category {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String        // e.g., "Food", "Transport"
+  type         String        // "income" or "expense"
+  transactions Transaction[]
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+  BORROW
+  DEBT_REPAYMENT
+  LEND
+  LOAN_COLLECTION
+  ADJUSTMENT
+}
+
+model Transaction {
+  id               String          @id @default(uuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId        String
+  account          Account         @relation(fields: [accountId], references: [id])
+  type             TransactionType
+  amount           Decimal
+  currency         String          @default("USD")
+  categoryId       String?
+  category         Category?       @relation(fields: [categoryId], references: [id])
+  counterpartyName String?
+  note             String?
+  transactionDate  DateTime        @default(now())
+  status           String          @default("COMPLETED")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+}
+
+model Debt {
+  id               String   @id @default(uuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type             String   // "Owe" or "Lent"
+  counterpartyName String
+  amount           Decimal
+  remainingAmount  Decimal
+  dueDate          DateTime?
+  status           String   @default("OPEN") // OPEN, OVERDUE, SETTLED
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
