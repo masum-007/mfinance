@@ -15,7 +15,7 @@ export async function createDebtEntry(formData: FormData) {
   const accountId = formData.get('accountId') as string
   const dueDate = formData.get('dueDate') as string
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     // 1. Create the Debt record
     await tx.debt.create({
       data: {
