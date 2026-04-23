@@ -26,3 +26,31 @@ export async function createAccount(formData: FormData) {
   // Refresh the accounts page to show the new data
   revalidatePath('/dashboard/accounts')
 }
+export async function addMoneyToAccount(accountId: string, amount: number, note: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  await prisma.$transaction(async (tx) => {
+    // 1. Increase the account balance
+    await tx.account.update({
+      where: { id: accountId },
+      data: { balance: { increment: amount } }
+    })
+
+    // 2. Log it as an adjustment/income so your net worth tracks it properly
+    await tx.transaction.create({
+      data: {
+        userId: user.id,
+        accountId: accountId,
+        type: 'ADJUSTMENT', 
+        amount: amount,
+        note: note || 'Manual Deposit',
+        status: 'COMPLETED'
+      }
+    })
+  })
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/accounts')
+}

@@ -21,24 +21,26 @@ export default async function DebtPage() {
   const iOwe = debts.filter((d: any) => d.type === 'Owe')
   const othersOwe = debts.filter((d: any) => d.type === 'Lent')
 
+  // Format accounts once to pass cleanly to our dialogs
+  const formattedAccounts = accounts.map((a: any) => ({ id: a.id, name: a.name }))
+
   return (
     <div className="space-y-10 pb-20">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          {/* Changed text-slate-900 to text-foreground */}
           <h1 className="text-3xl font-black tracking-tight text-foreground">Liabilities & Receivables</h1>
           <p className="text-slate-500 dark:text-slate-400 font-medium">Keep track of your personal commitments.</p>
         </div>
-        <AddDebtDialog accounts={accounts.map((a: any) => ({ id: a.id, name: a.name }))} />
+        <AddDebtDialog accounts={formattedAccounts} />
       </div>
 
       <div className="grid gap-10 lg:grid-cols-2">
+        {/* Section: People I Owe */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 px-1">
             <div className="h-10 w-10 flex items-center justify-center rounded-2xl bg-rose-50 dark:bg-rose-950/30 text-rose-600 border border-rose-100 dark:border-rose-900/30 shadow-sm">
               <UserMinus size={20} />
             </div>
-            {/* Changed text-slate-800 to text-foreground */}
             <h2 className="text-xl font-extrabold text-foreground">People I Owe</h2>
           </div>
           
@@ -49,12 +51,10 @@ export default async function DebtPage() {
               </div>
             ) : (
               iOwe.map((debt: any) => (
-                /* Removed bg-white! The Card component now handles bg-card automatically */
                 <Card key={debt.id} className="group border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-3xl overflow-hidden">
                   <div className="absolute left-0 top-0 bottom-0 w-2 bg-rose-500" />
                   <CardContent className="p-6 pl-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="space-y-1">
-                      {/* Removed text-slate-900 */}
                       <p className="text-xl font-black text-foreground group-hover:text-rose-600 transition-colors">
                         {debt.counterpartyName}
                       </p>
@@ -68,7 +68,13 @@ export default async function DebtPage() {
                       <div className="text-2xl font-black text-rose-600 tracking-tighter">
                         ${Number(debt.remainingAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </div>
-                      <RepayDialog debtId={debt.id} currentAmount={Number(debt.remainingAmount)} type={debt.type} />
+                      {/* ACCOUNTS PROP ADDED HERE */}
+                      <RepayDialog 
+                        debtId={debt.id} 
+                        currentAmount={Number(debt.remainingAmount)} 
+                        type={debt.type} 
+                        accounts={formattedAccounts} 
+                      />
                     </div>
                   </CardContent>
                 </Card>
@@ -110,7 +116,13 @@ export default async function DebtPage() {
                       <div className="text-2xl font-black text-emerald-600 tracking-tighter">
                         ${Number(debt.remainingAmount).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </div>
-                      <RepayDialog debtId={debt.id} currentAmount={Number(debt.remainingAmount)} type={debt.type} />
+                      {/* ACCOUNTS PROP ADDED HERE */}
+                      <RepayDialog 
+                        debtId={debt.id} 
+                        currentAmount={Number(debt.remainingAmount)} 
+                        type={debt.type} 
+                        accounts={formattedAccounts} 
+                      />
                     </div>
                   </CardContent>
                 </Card>

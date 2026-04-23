@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import prisma from '@/lib/prisma'
 import { Card, CardContent } from '@/components/ui/card'
 import { CreateAccountDialog } from './create-account-dialog'
+import { AddMoneyDialog } from './add-money-dialog' 
 import { Landmark, Smartphone, Wallet, CreditCard, Coins, Activity } from 'lucide-react'
 
 // Helper function to pick the right icon
@@ -94,9 +95,14 @@ export default async function AccountsPage() {
                     <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-2 drop-shadow-sm">
                       {account.name}
                     </p>
-                    <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tighter">
+                    <h2 className="text-4xl sm:text-5xl font-black text-slate-900 tracking-tighter truncate">
                       ${Number(account.balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </h2>
+                    
+                    {/* MOVED: Button is now on its own row below the balance */}
+                    <div className="mt-6 flex items-center">
+                      <AddMoneyDialog accountId={account.id} accountName={account.name} />
+                    </div>
                   </div>
                 </CardContent>
               </Card>

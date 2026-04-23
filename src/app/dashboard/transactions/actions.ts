@@ -17,44 +17,48 @@ export async function createTransaction(formData: FormData) {
   const categoryId = formData.get('categoryId') as string;
   
   // Validation
-  if (!amount || amount <= 0) throw new Error('Invalid amount')
-  if (!accountId) throw new Error('Account is required')
+  if (!amount || amount <= 0) return { error: 'Invalid amount' }
+  if (!accountId) return { error: 'Account is required' }
+
+  // PRE-CHECK: Verify the account exists and check the balance
+  const accountCheck = await prisma.account.findFirst({
+    where: { id: accountId, userId: user.id }
+  })
+
+  if (!accountCheck) return { error: 'Account not found' }
+
+  // OVERDRAFT PROTECTION: Reject if spending more than available
+  if (type === 'EXPENSE' && Number(accountCheck.balance) < amount) {
+    return { error: `Insufficient funds. Your ${accountCheck.name} balance is only ${accountCheck.balance}.` }
+  }
 
   // We use prisma.$transaction to ensure the account balance updates 
   // at the EXACT same time the transaction is recorded.
   await prisma.$transaction(async (tx: any) => {
-    // 1. Fetch the current account to ensure it exists and belongs to the user
-    const account = await tx.account.findFirst({
-      where: { id: accountId, userId: user.id }
-    })
-
-    if (!account) throw new Error('Account not found')
-
-    // 2. Calculate the new balance
+    // 1. Calculate the new balance
     const balanceChange = type === 'EXPENSE' ? -amount : amount
-    const newBalance = Number(account.balance) + balanceChange
+    const newBalance = Number(accountCheck.balance) + balanceChange
 
-    // 3. Update the account balance
+    // 2. Update the account balance
     await tx.account.update({
       where: { id: accountId },
       data: { balance: newBalance }
     })
 
-    // 4. Create the transaction record
+    // 3. Create the transaction record
     await tx.transaction.create({
       data: {
         userId: user.id,
         accountId: accountId,
-        categoryId: categoryId,
+        categoryId: categoryId || null, // Ensure empty strings become null
         type: type,
         amount: amount,
-        note: note,
+        note: note || '',
         status: 'COMPLETED'
       }
     })
   })
 
-  revalidatePath('/dashboard/accounts')
-  revalidatePath('/dashboard/transactions')
   revalidatePath('/dashboard')
+  revalidatePath('/dashboard/transactions')
 }

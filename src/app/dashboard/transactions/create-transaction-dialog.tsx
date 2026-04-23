@@ -34,92 +34,101 @@ export function CreateTransactionDialog({
         <span>New Entry</span>
       </DialogTrigger>
       {/* Styled directly on DialogContent for perfect corners */}
-      <DialogContent className="sm:max-w-[440px] p-6 sm:p-8 bg-white rounded-3xl sm:rounded-[2rem] border-slate-100 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="text-left mb-6 space-y-1.5">
-          <DialogTitle className="text-2xl font-black tracking-tight text-slate-900">
-            Record Transaction
-          </DialogTitle>
-          <DialogDescription className="text-slate-500 font-medium">
-            Log your daily income or spending.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[440px] p-0 bg-white rounded-3xl border-slate-100 shadow-2xl overflow-hidden">
+        {/* Header Section with dynamic background */}
+        <div className={`p-6 sm:p-8 pb-6 transition-colors duration-500 ${type === 'EXPENSE' ? 'bg-rose-50/50' : 'bg-emerald-50/50'}`}>
+          <DialogHeader className="text-left space-y-2">
+            <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight">
+              Record Transaction
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 font-medium">
+              Enter the details of your latest financial activity.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
         <form
           action={async (fd) => {
-            await createTransaction(fd);
-            setOpen(false);
+            const result = await createTransaction(fd);
+            if (result?.error) {
+              alert(result.error);
+            } else {
+              setOpen(false);
+            }
           }}
-          className="space-y-6"
+          className="p-6 sm:p-8 pt-0 space-y-6"
         >
-          <div className="flex p-1 bg-slate-100 rounded-2xl w-fit">
+          {/* Custom Toggle Switch */}
+          <div className="flex bg-slate-100 p-1 rounded-2xl relative">
+            <div 
+              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-xl bg-white shadow-sm transition-all duration-300 ease-out ${type === 'INCOME' ? 'translate-x-full' : 'translate-x-0'}`} 
+            />
             <button
               type="button"
               onClick={() => setType("EXPENSE")}
-              className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${type === "EXPENSE" ? "bg-white text-rose-600 shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
+              className={`flex-1 py-3 text-sm font-black rounded-xl z-10 transition-colors ${type === 'EXPENSE' ? 'text-rose-600' : 'text-slate-400 hover:text-slate-600'}`}
             >
-              Expense
+              EXPENSE
             </button>
             <button
               type="button"
               onClick={() => setType("INCOME")}
-              className={`px-6 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${type === "INCOME" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-400 hover:text-slate-600"}`}
+              className={`flex-1 py-3 text-sm font-black rounded-xl z-10 transition-colors ${type === 'INCOME' ? 'text-emerald-600' : 'text-slate-400 hover:text-slate-600'}`}
             >
-              Income
+              INCOME
             </button>
-            <input type="hidden" name="type" value={type} />
           </div>
+          <input type="hidden" name="type" value={type} />
 
-          <div className="space-y-4">
+          <div className="space-y-5">
+            {/* Amount Input */}
             <div className="flex flex-col gap-2">
               <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Amount
               </Label>
-              <div className="flex items-center gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-100 focus-within:border-primary/50 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
-                <span className="text-xl font-black text-slate-400 pl-2">
-                  $
-                </span>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-black text-xl">$</span>
                 <Input
                   name="amount"
                   type="number"
                   step="0.01"
-                  className="text-2xl font-black border-none bg-transparent shadow-none focus-visible:ring-0 p-0 h-10 w-full"
+                  className="h-14 pl-10 rounded-xl border border-slate-200 bg-slate-50 font-black text-2xl text-slate-900 focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/10 transition-all"
                   placeholder="0.00"
                   required
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Two Column Layout for Account & Category */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Account
                 </Label>
-                {/* 1. Add defaultValue="" to the <select> tag */}
                 <select
                   name="accountId"
-                  defaultValue=""
-                  className="h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50 font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 font-bold text-sm px-3 text-slate-700 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+                  required
                 >
-                  {/* 2. Remove the 'selected' attribute from this option */}
                   <option value="" disabled>
                     Select...
                   </option>
-                 {accounts.map((acc: any) => (
+                  {accounts.map((acc: any) => (
                     <option key={acc.id} value={acc.id}>
                       {acc.name}
                     </option>
                   ))}
                 </select>
               </div>
+
               <div className="flex flex-col gap-2">
                 <Label className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   Category
                 </Label>
-                {/* 1. Add defaultValue="" right here on the select tag */}
                 <select
                   name="categoryId"
                   defaultValue=""
-                  className="h-12 w-full px-4 rounded-xl border border-slate-200 bg-slate-50 font-semibold outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 font-bold text-sm px-3 text-slate-700 outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
                   required
                 >
                   {/* 2. Remove the 'selected' attribute from this option */}
