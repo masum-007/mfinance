@@ -75,12 +75,11 @@ export default async function SettingsPage() {
         <div className="flex-1">
           <TabsContent value="categories" className="mt-0 focus-visible:ring-0">
             <div className="grid gap-8">
-              
               {/* Quick Add Category Card */}
               <Card className="border border-slate-100 shadow-2xl shadow-slate-200/40 rounded-[2.5rem] bg-white overflow-hidden relative">
                 {/* Subtle top gradient accent */}
                 <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-primary/40 to-primary/10" />
-                
+
                 <CardHeader className="p-8 pb-4">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shadow-inner">
@@ -96,9 +95,12 @@ export default async function SettingsPage() {
                     </div>
                   </div>
                 </CardHeader>
-                
+
                 <CardContent className="p-8 pt-2">
-                  <form action={createCategory} className="flex flex-col md:flex-row gap-5 items-end bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+                  <form
+                    action={createCategory}
+                    className="flex flex-col md:flex-row gap-5 items-end bg-slate-50/50 p-6 rounded-3xl border border-slate-100"
+                  >
                     <div className="w-full space-y-2">
                       <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">
                         Label Name
@@ -122,7 +124,10 @@ export default async function SettingsPage() {
                         <option value="INCOME">Income</option>
                       </select>
                     </div>
-                    <Button type="submit" className="h-12 px-8 rounded-2xl font-black shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
+                    <Button
+                      type="submit"
+                      className="h-12 px-8 rounded-2xl font-black shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
+                    >
                       Save Label
                     </Button>
                   </form>
@@ -134,32 +139,45 @@ export default async function SettingsPage() {
                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 px-2">
                   Active Labels ({categories.length})
                 </h3>
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {categories.map((cat: any) => (
                     <div
                       key={cat.id}
                       className="group relative flex items-center justify-between p-5 bg-white rounded-3xl shadow-sm border border-slate-100 hover:border-primary/30 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                     >
                       <div className="flex items-center gap-4">
-                        <div className={`h-12 w-12 flex items-center justify-center rounded-2xl font-black text-lg shadow-inner ${
-                          cat.type === "INCOME" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
-                        }`}>
+                        <div
+                          className={`h-12 w-12 flex items-center justify-center rounded-2xl font-black text-lg shadow-inner ${
+                            cat.type === "INCOME"
+                              ? "bg-emerald-50 text-emerald-600"
+                              : "bg-rose-50 text-rose-600"
+                          }`}
+                        >
                           {cat.name[0]}
                         </div>
                         <div className="space-y-0.5">
                           <p className="font-bold text-slate-900 group-hover:text-primary transition-colors">
                             {cat.name}
                           </p>
-                          <p className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md w-fit ${
-                            cat.type === "INCOME" ? "bg-emerald-100/50 text-emerald-700" : "bg-rose-100/50 text-rose-700"
-                          }`}>
+                          <p
+                            className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md w-fit ${
+                              cat.type === "INCOME"
+                                ? "bg-emerald-100/50 text-emerald-700"
+                                : "bg-rose-100/50 text-rose-700"
+                            }`}
+                          >
                             {cat.type}
                           </p>
                         </div>
                       </div>
                       <form action={deleteCategory}>
                         <input type="hidden" name="id" value={cat.id} />
-                        <Button type="submit" variant="ghost" size="icon" className="rounded-xl text-slate-300 hover:text-rose-600 hover:bg-rose-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
+                        <Button
+                          type="submit"
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                        >
                           <Trash2 size={18} />
                         </Button>
                       </form>
@@ -174,25 +192,39 @@ export default async function SettingsPage() {
           <TabsContent value="profile" className="mt-0">
             <Card className="border border-slate-100 shadow-2xl shadow-slate-200/40 rounded-[2.5rem] bg-white p-10 flex flex-col items-center text-center relative overflow-hidden">
               <div className="absolute top-0 inset-x-0 h-32 bg-slate-50/50 border-b border-slate-100" />
-              
+
               <div className="h-28 w-28 rounded-full bg-white shadow-xl flex items-center justify-center mb-6 relative z-10 border-4 border-white">
                 <User size={48} className="text-slate-300" />
                 <div className="absolute bottom-1 right-1 h-7 w-7 bg-emerald-500 border-4 border-white rounded-full flex items-center justify-center text-white">
                   <ShieldCheck size={12} strokeWidth={4} />
                 </div>
               </div>
-              
-              <h2 className="text-3xl font-black tracking-tight text-slate-900 relative z-10">{user.email}</h2>
-              <p className="text-slate-500 font-bold mt-1 text-sm relative z-10">Verified Financial Identity</p>
-              
+
+              <h2 className="text-3xl font-black tracking-tight text-slate-900 relative z-10">
+                {user.email}
+              </h2>
+              <p className="text-slate-500 font-bold mt-1 text-sm relative z-10">
+                Verified Financial Identity
+              </p>
+
               <div className="mt-10 w-full grid grid-cols-2 gap-4 relative z-10">
                 <div className="text-left p-5 rounded-3xl bg-slate-50 border border-slate-100">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Member Since</p>
-                  <p className="font-bold text-slate-900 text-lg mt-1">{new Date(user.created_at || Date.now()).toLocaleDateString()}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Member Since
+                  </p>
+                  <p className="font-bold text-slate-900 text-lg mt-1">
+                    {new Date(
+                      user.created_at || Date.now(),
+                    ).toLocaleDateString()}
+                  </p>
                 </div>
                 <div className="text-left p-5 rounded-3xl bg-primary/5 border border-primary/10">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">Current Plan</p>
-                  <p className="font-black text-primary text-lg mt-1">MFinance Pro</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-primary/60">
+                    Current Plan
+                  </p>
+                  <p className="font-black text-primary text-lg mt-1">
+                    MFinance Pro
+                  </p>
                 </div>
               </div>
             </Card>
@@ -202,8 +234,13 @@ export default async function SettingsPage() {
           <TabsContent value="billing" className="mt-0">
             <Card className="border border-slate-100 shadow-2xl shadow-slate-200/40 rounded-[2.5rem] bg-white p-10 text-center">
               <CreditCard size={48} className="mx-auto text-slate-300 mb-4" />
-              <h3 className="text-2xl font-black text-slate-900">Limits & Configuration</h3>
-              <p className="text-slate-500 font-medium mt-2">Advanced financial limits and settings are coming in the next update.</p>
+              <h3 className="text-2xl font-black text-slate-900">
+                Limits & Configuration
+              </h3>
+              <p className="text-slate-500 font-medium mt-2">
+                Advanced financial limits and settings are coming in the next
+                update.
+              </p>
             </Card>
           </TabsContent>
 
@@ -211,11 +248,15 @@ export default async function SettingsPage() {
           <TabsContent value="notifications" className="mt-0">
             <Card className="border border-slate-100 shadow-2xl shadow-slate-200/40 rounded-[2.5rem] bg-white p-10 text-center">
               <Bell size={48} className="mx-auto text-slate-300 mb-4" />
-              <h3 className="text-2xl font-black text-slate-900">Alerts & Notifications</h3>
-              <p className="text-slate-500 font-medium mt-2">Custom alerts for budgets and payments are coming in the next update.</p>
+              <h3 className="text-2xl font-black text-slate-900">
+                Alerts & Notifications
+              </h3>
+              <p className="text-slate-500 font-medium mt-2">
+                Custom alerts for budgets and payments are coming in the next
+                update.
+              </p>
             </Card>
           </TabsContent>
-
         </div>
       </Tabs>
     </div>
