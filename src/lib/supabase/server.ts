@@ -4,9 +4,9 @@ import { cookies } from 'next/headers'
 export async function createClient() {
   const cookieStore = await cookies()
 
-  // Bulletproof sanitization for Vercel env variables
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/$/, '')!
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()!
+  // HARDCODED BYPASS: This guarantees Vercel cannot break the strings
+  const supabaseUrl = "https://csszmtelqvispxrunqkv.supabase.co"
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNzc3ptdGVscXZpc3B4cnVucWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NDY3MjcsImV4cCI6MjA5MjQyMjcyN30.642UeEpHC7oa6eSsZYiQQvPUC9lFUCtrgVvTZV-QE94"
 
   return createServerClient(
     supabaseUrl,
