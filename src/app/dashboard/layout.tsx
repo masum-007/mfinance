@@ -1,115 +1,96 @@
+"use client"
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { 
-  Home, CreditCard, ArrowRightLeft, HandCoins, 
-  PieChart, Settings, Target, LogOut, UserCircle, Repeat 
+  LayoutDashboard, 
+  Wallet, 
+  ArrowRightLeft, 
+  PieChart, 
+  Landmark, 
+  CalendarCheck, 
+  Settings, 
+  Menu
 } from 'lucide-react'
-import { logout } from './actions'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuGroup,
-} from "@/components/ui/dropdown-menu"
-import { createClient } from '@/lib/supabase/server'
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 
 const navItems = [
-  { label: 'Dashboard', href: '/dashboard', icon: Home },
-  { label: 'Accounts', href: '/dashboard/accounts', icon: CreditCard },
-  { label: 'Transactions', href: '/dashboard/transactions', icon: ArrowRightLeft },
-  { label: 'Budgets', href: '/dashboard/budgets', icon: Target },
-  { label: 'Debts & Loans', href: '/dashboard/debts', icon: HandCoins },
-  { label: 'Subscriptions', href: '/dashboard/subscriptions', icon: Repeat },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/accounts', label: 'Accounts', icon: Wallet },
+  { href: '/dashboard/transactions', label: 'Transactions', icon: ArrowRightLeft },
+  { href: '/dashboard/budgets', label: 'Budgets', icon: PieChart },
+  { href: '/dashboard/debts', label: 'Debts', icon: Landmark },
+  { href: '/dashboard/subscriptions', label: 'Subscriptions', icon: CalendarCheck },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+
+  const NavLinks = () => (
+    <nav className="space-y-2 mt-8">
+      {navItems.map((item) => {
+        const isActive = pathname === item.href
+        const Icon = item.icon
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold transition-all duration-300 ${
+              isActive
+                ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/20'
+                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Icon size={20} />
+            {item.label}
+          </Link>
+        )
+      })}
+    </nav>
+  )
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="w-64 border-r border-border bg-card hidden md:flex flex-col sticky top-0 h-screen">
-        <div className="h-16 flex items-center px-6 border-b border-border">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-primary">
-            <div className="bg-primary text-background p-1.5 rounded-lg shadow-md">
+    <div className="min-h-screen bg-slate-50 flex">
+      <aside className="hidden lg:flex flex-col w-[280px] fixed inset-y-0 left-0 border-r border-slate-200 bg-white p-6 z-20">
+        <div className="flex items-center gap-2 font-black text-2xl tracking-tight text-slate-900 px-2 mb-4">
+          <div className="bg-primary text-white p-1.5 rounded-lg shadow-md shadow-primary/20">
+            <PieChart size={24} />
+          </div>
+          <span>MFinance</span>
+        </div>
+        <NavLinks />
+      </aside>
+
+      <div className="flex-1 lg:pl-[280px] flex flex-col min-h-screen w-full">
+        <header className="lg:hidden flex items-center justify-between p-4 sm:p-6 bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+          <div className="flex items-center gap-2 font-black text-xl tracking-tight text-slate-900">
+            <div className="bg-primary text-white p-1.5 rounded-lg shadow-sm">
               <PieChart size={20} />
             </div>
             <span>MFinance</span>
           </div>
-        </div>
-        
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map((item: any) => (
-            <Link 
-              key={item.href}
-              href={item.href} 
-              className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 text-slate-500 hover:bg-slate-100 hover:text-primary group"
-            >
-              <item.icon size={18} className="group-hover:scale-110 transition-transform" />
-              {item.label}
-            </Link>
-          ))}
-        </nav>
 
-        <div className="p-4 border-t border-border space-y-1">
-          <Link href="/dashboard/settings" className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl text-slate-500 hover:bg-slate-100 transition-colors">
-            <Settings size={18} />
-            Settings
-          </Link>
-          
-          <form action={logout}>
-            <button type="submit" className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-xl text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer">
-              <LogOut size={18} />
-              Logout
-            </button>
-          </form>
-        </div>
-      </aside>
-
-      <div className="flex-1 flex flex-col">
-        <header className="h-16 border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-40 flex items-center justify-between px-8">
-          <div className="md:hidden font-black text-primary flex items-center gap-2">
-            <PieChart size={20} /> MFinance
-          </div>
-          
-          <div className="flex items-center gap-4 ml-auto">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="outline-none h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors cursor-pointer shadow-sm">
-                <UserCircle size={22} />
-              </DropdownMenuTrigger>
-              
-              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 border-border shadow-2xl bg-card mt-1">
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel className="font-bold text-foreground truncate px-3 py-2">
-                    {user?.email || 'My Account'}
-                  </DropdownMenuLabel>
-                </DropdownMenuGroup>
-
-                <DropdownMenuSeparator className="bg-border" />
-                
-                <DropdownMenuItem className="rounded-xl cursor-pointer p-0">
-                  <Link href="/dashboard/settings" className="flex items-center w-full p-3 font-bold text-slate-600 hover:bg-slate-50 outline-none rounded-xl">
-                    <Settings className="mr-2 h-4 w-4" /> System Settings
-                  </Link>
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator className="bg-border" />
-                
-                <form action={logout}>
-                  <DropdownMenuItem className="rounded-xl p-0">
-                    <button type="submit" className="flex w-full items-center p-3 cursor-pointer font-bold text-rose-600 hover:bg-rose-50 outline-none rounded-xl">
-                      <LogOut className="mr-2 h-4 w-4" /> Secure Logout
-                    </button>
-                  </DropdownMenuItem>
-                </form>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <Sheet>
+            {/* FIXED: Removed asChild and styled the SheetTrigger directly */}
+            <SheetTrigger className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center">
+              <Menu size={24} />
+            </SheetTrigger>
+            
+            <SheetContent side="left" className="w-[280px] p-6 bg-white border-r-0">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <div className="flex items-center gap-2 font-black text-2xl tracking-tight text-slate-900 px-2 mb-4 mt-2">
+                <div className="bg-primary text-white p-1.5 rounded-lg shadow-md shadow-primary/20">
+                  <PieChart size={24} />
+                </div>
+                <span>MFinance</span>
+              </div>
+              <NavLinks />
+            </SheetContent>
+          </Sheet>
         </header>
-        
-        <main className="p-6 lg:p-10 max-w-7xl mx-auto w-full">
+
+        <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 w-full max-w-[1400px] mx-auto overflow-x-hidden">
           {children}
         </main>
       </div>

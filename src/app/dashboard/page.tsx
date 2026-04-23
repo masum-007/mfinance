@@ -72,7 +72,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ pe
     Note: t.note || ''
   }))
 
-  // The new UI Configuration for the Modern Cards
   const cards = [
     { 
       label: 'Current Balance', 
@@ -142,16 +141,16 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ pe
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Overview</h1>
           <p className="text-slate-500 font-medium">Real-time insights into your financial flow.</p>
         </div>
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
           <DateFilter />
           <ExportButton data={exportData} filename={`MFinance-Transactions-${period}`} />
         </div>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {/* FIXED: Added grid-cols-1 to force stacking on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {cards.map((card: any) => (
           <Card key={card.label} className={`group relative p-0 border-none shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1 overflow-hidden bg-gradient-to-br ${card.bg}`}>
-            {/* Base Card Content */}
             <div className="p-6 relative z-10 transition-transform duration-500 group-hover:-translate-y-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-2.5 rounded-xl bg-white/20 text-white backdrop-blur-sm">
@@ -166,7 +165,6 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ pe
               </div>
             </div>
 
-            {/* Hover Details Overlay (Slides up seamlessly) */}
             <div className="absolute inset-x-0 bottom-0 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 bg-black/40 backdrop-blur-md p-5 z-20 flex flex-col justify-end">
               {card.details}
             </div>
@@ -174,9 +172,14 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ pe
         ))}
       </div>
       
-      <div className="grid gap-6 lg:grid-cols-3">
-        <SpendingChart data={chartData} />
-        <CategoryPie data={pieData} />
+      {/* FIXED: Set exact column spans for the charts so they stack beautifully on mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <SpendingChart data={chartData} />
+        </div>
+        <div className="lg:col-span-1">
+          <CategoryPie data={pieData} />
+        </div>
       </div>
     </div>
   )
