@@ -54,3 +54,22 @@ export async function addMoneyToAccount(accountId: string, amount: number, note:
   revalidatePath('/dashboard')
   revalidatePath('/dashboard/accounts')
 }
+export async function deleteAccount(accountId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  await prisma.$transaction(async (tx) => {
+    // 1. Delete all transactions tied to this account to prevent foreign key crashes
+    await tx.transaction.deleteMany({ where: { accountId: accountId, userId: user.id } })
+    
+    // 2. Delete all subscriptions tied to this account
+    await tx.subscription.deleteMany({ where: { accountId: accountId, userId: user.id } })
+    
+    // 3. Delete the account itself
+    await tx.account.delete({ where: { id: accountId, userId: user.id } })
+  })
+
+  revalidatePath('/dashboard')
+  revalidatePath('/dashboard/accounts')
+}

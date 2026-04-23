@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { CreateAccountDialog } from './create-account-dialog'
 import { AddMoneyDialog } from './add-money-dialog' 
 import { Landmark, Smartphone, Wallet, CreditCard, Coins, Activity } from 'lucide-react'
+import { DeleteAccountButton } from './delete-account-button'
 
 // Helper function to pick the right icon
 const getAccountIcon = (type: string) => {
@@ -71,6 +72,11 @@ export default async function AccountsPage() {
                 key={account.id} 
                 className="relative overflow-hidden group border border-slate-100 shadow-xl shadow-slate-200/40 rounded-[2.5rem] bg-white transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 hover:border-slate-200"
               >
+                {/* NEW: The Delete Button mapped to the top right */}
+                <div className="absolute top-6 right-6 z-30">
+                  <DeleteAccountButton accountId={account.id} accountName={account.name} />
+                </div>
+                
                 {/* Background Ambient Glow */}
                 <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl ${styles.gradient} to-transparent rounded-full blur-3xl opacity-40 group-hover:opacity-70 transition-opacity duration-500 pointer-events-none translate-x-10 -translate-y-10`} />
                 
