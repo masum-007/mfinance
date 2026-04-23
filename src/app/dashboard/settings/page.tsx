@@ -52,7 +52,8 @@ export default async function SettingsPage() {
       >
         {/* Navigation Sidebar */}
         <div className="w-full md:w-64 shrink-0">
-          <TabsList className="flex md:flex-col items-start justify-start bg-transparent h-auto w-full gap-2 overflow-x-auto no-scrollbar">
+          {/* FIXED: Added !h-auto to override shadcn's h-10, added md:overflow-visible */}
+          <TabsList className="flex flex-row md:flex-col items-start justify-start bg-transparent !h-auto w-full p-0 gap-2 overflow-x-auto md:overflow-visible no-scrollbar">
             {[
               { value: "categories", icon: Tags, label: "Categories" },
               { value: "profile", icon: User, label: "Account" },
@@ -196,6 +197,25 @@ export default async function SettingsPage() {
               </div>
             </Card>
           </TabsContent>
+
+          {/* NEW: Limits & Billing Placeholder */}
+          <TabsContent value="billing" className="mt-0">
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-200/40 rounded-[2.5rem] bg-white p-10 text-center">
+              <CreditCard size={48} className="mx-auto text-slate-300 mb-4" />
+              <h3 className="text-2xl font-black text-slate-900">Limits & Configuration</h3>
+              <p className="text-slate-500 font-medium mt-2">Advanced financial limits and settings are coming in the next update.</p>
+            </Card>
+          </TabsContent>
+
+          {/* NEW: Notifications Placeholder */}
+          <TabsContent value="notifications" className="mt-0">
+            <Card className="border border-slate-100 shadow-2xl shadow-slate-200/40 rounded-[2.5rem] bg-white p-10 text-center">
+              <Bell size={48} className="mx-auto text-slate-300 mb-4" />
+              <h3 className="text-2xl font-black text-slate-900">Alerts & Notifications</h3>
+              <p className="text-slate-500 font-medium mt-2">Custom alerts for budgets and payments are coming in the next update.</p>
+            </Card>
+          </TabsContent>
+
         </div>
       </Tabs>
     </div>

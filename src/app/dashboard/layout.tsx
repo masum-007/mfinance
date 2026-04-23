@@ -1,7 +1,8 @@
 "use client"
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { 
   LayoutDashboard, 
   Wallet, 
@@ -10,7 +11,8 @@ import {
   Landmark, 
   CalendarCheck, 
   Settings, 
-  Menu
+  Menu,
+  LogOut
 } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 
@@ -26,9 +28,18 @@ const navItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Securely end the Supabase session and redirect to login
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+    router.refresh() // Clears the Next.js router cache
+  }
 
   const NavLinks = () => (
-    <nav className="space-y-2 mt-8">
+    <nav className="space-y-2 mt-8 flex-1">
       {navItems.map((item) => {
         const isActive = pathname === item.href
         const Icon = item.icon
@@ -52,6 +63,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
+      {/* 1. DESKTOP SIDEBAR */}
       <aside className="hidden lg:flex flex-col w-[280px] fixed inset-y-0 left-0 border-r border-slate-200 bg-white p-6 z-20">
         <div className="flex items-center gap-2 font-black text-2xl tracking-tight text-slate-900 px-2 mb-4">
           <div className="bg-primary text-white p-1.5 rounded-lg shadow-md shadow-primary/20">
@@ -59,10 +71,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <span>MFinance</span>
         </div>
-        <NavLinks />
+        
+        <div className="flex flex-col flex-1 overflow-y-auto">
+          <NavLinks />
+        </div>
+
+        {/* DESKTOP LOGOUT BUTTON */}
+        <div className="mt-auto pt-4 border-t border-slate-100">
+          <button 
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 px-4 py-3.5 rounded-2xl font-bold text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-all duration-300"
+          >
+            <LogOut size={20} />
+            Log Out
+          </button>
+        </div>
       </aside>
 
+      {/* 2. MAIN CONTENT AREA */}
       <div className="flex-1 lg:pl-[280px] flex flex-col min-h-screen w-full">
+        
+        {/* 3. MOBILE HEADER WITH HAMBURGER */}
         <header className="lg:hidden flex items-center justify-between p-4 sm:p-6 bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-2 font-black text-xl tracking-tight text-slate-900">
             <div className="bg-primary text-white p-1.5 rounded-lg shadow-sm">
@@ -72,12 +101,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <Sheet>
-            {/* FIXED: Removed asChild and styled the SheetTrigger directly */}
             <SheetTrigger className="p-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors flex items-center justify-center">
               <Menu size={24} />
             </SheetTrigger>
             
-            <SheetContent side="left" className="w-[280px] p-6 bg-white border-r-0">
+            <SheetContent side="left" className="w-[280px] p-6 bg-white border-r-0 flex flex-col h-full">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <div className="flex items-center gap-2 font-black text-2xl tracking-tight text-slate-900 px-2 mb-4 mt-2">
                 <div className="bg-primary text-white p-1.5 rounded-lg shadow-md shadow-primary/20">
@@ -85,11 +113,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
                 <span>MFinance</span>
               </div>
-              <NavLinks />
+              
+              <div className="flex flex-col flex-1 overflow-y-auto">
+                <NavLinks />
+              </div>
+
+              {/* MOBILE LOGOUT BUTTON */}
+              <div className="mt-auto pt-4 border-t border-slate-100">
+                <button 
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-3 px-4 py-3.5 rounded-2xl font-bold text-rose-500 hover:text-rose-600 hover:bg-rose-50 transition-all duration-300"
+                >
+                  <LogOut size={20} />
+                  Log Out
+                </button>
+              </div>
             </SheetContent>
           </Sheet>
         </header>
 
+        {/* 4. MAIN PAGE CONTENT */}
         <main className="flex-1 p-4 sm:p-6 md:p-8 lg:p-10 w-full max-w-[1400px] mx-auto overflow-x-hidden">
           {children}
         </main>

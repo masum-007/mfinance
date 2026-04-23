@@ -147,11 +147,12 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ pe
         </div>
       </div>
 
-      {/* FIXED: Added grid-cols-1 to force stacking on mobile */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {cards.map((card: any) => (
-          <Card key={card.label} className={`group relative p-0 border-none shadow-lg transition-all hover:shadow-2xl hover:-translate-y-1 overflow-hidden bg-gradient-to-br ${card.bg}`}>
-            <div className="p-6 relative z-10 transition-transform duration-500 group-hover:-translate-y-4">
+          <Card key={card.label} className={`group relative p-0 border-none shadow-lg transition-all hover:shadow-2xl lg:hover:-translate-y-1 overflow-hidden bg-gradient-to-br ${card.bg}`}>
+            
+            {/* 1. Base Content: Added 'pb-[120px] lg:pb-6' to pad the bottom on mobile so text isn't covered */}
+            <div className="p-6 pb-[120px] lg:pb-6 relative z-10 transition-transform duration-500 lg:group-hover:-translate-y-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="p-2.5 rounded-xl bg-white/20 text-white backdrop-blur-sm">
                   <card.icon size={20} />
@@ -165,14 +166,15 @@ export default async function DashboardPage(props: { searchParams?: Promise<{ pe
               </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 bg-black/40 backdrop-blur-md p-5 z-20 flex flex-col justify-end">
+            {/* 2. Overlay: Made permanently visible on mobile, hide-until-hover on desktop (lg:) */}
+            <div className="absolute inset-x-0 bottom-0 opacity-100 translate-y-0 lg:translate-y-full lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 transition-all duration-500 bg-black/40 backdrop-blur-md p-5 z-20 flex flex-col justify-end">
               {card.details}
             </div>
+            
           </Card>
         ))}
       </div>
       
-      {/* FIXED: Set exact column spans for the charts so they stack beautifully on mobile */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <SpendingChart data={chartData} />
